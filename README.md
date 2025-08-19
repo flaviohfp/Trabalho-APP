@@ -4,6 +4,7 @@ Trabalho em trio de programação de aplicativos, Nomes: Flavio, Matheus, Clever
 
 <<<<<<< HEAD
 teste
+teste
 =======
 
 
