@@ -1,13 +1,8 @@
 # Trabalho-APP
 
-Trabalho em trio de programação de aplicativos, Nomes: Flavio, Matheus, Cleverton. V2 ADS SENAI
+Trabalho em trio de programação de aplicativos
 
+Nomes: Flavio, Matheus, Cleverton. 
 
-
-
-
-teste Flavio commit
-teste Matheus commit
-
-teste Cleverton commit
+V2 ADS SENAI
 
