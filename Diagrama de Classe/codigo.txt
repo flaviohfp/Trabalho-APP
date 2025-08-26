@@ -1,0 +1,75 @@
+@startuml
+title Diagrama de Classes - Aplicativo Hotel
+
+class Menu {
+  +loginUsuario()
+  +reservarQuarto()
+}
+
+class TelaLogin {
+  +login(nome: String, email: String, senha: String): boolean
+}
+
+class TelaCadastro {
+  +cadastrar(nome: String, sobrenome: String, telefone: String, email: String, senha: String)
+}
+
+class TelaListaQuartos {
+  +exibirQuartosDisponiveis(): List<Quarto>
+  +selecionarQuarto(quarto: Quarto)
+}
+
+class TelaReserva {
+  +reservarQuarto(cliente: Cliente, quarto: Quarto, data: Date)
+}
+
+class TelaFinalizacaoCompra {
+  +exibirResumoReserva(reserva: Reserva)
+  +calcularValorTotal(reserva: Reserva): double
+  +confirmarPagamento()
+}
+
+class TelaEdicaoReserva {
+  +alterarQuarto(reserva: Reserva, novoQuarto: Quarto)
+  +alterarTipoCama(reserva: Reserva, tipoCama: String)
+  +excluirReserva(reserva: Reserva)
+}
+
+class Cliente {
+  -id: int
+  -nome: String
+  -sobrenome: String
+  -telefone: String
+  -email: String
+  -senha: String
+  +autenticar(email: String, senha: String): boolean
+}
+
+class Quarto {
+  -numero: int
+  -tipo: String
+  -cama: String
+  -preco: double
+  -disponivel: boolean
+  +verificarDisponibilidade(): boolean
+}
+
+class Reserva {
+  -id: int
+  -data: Date
+  -cliente: Cliente
+  -quarto: Quarto
+  +getValorTotal(): double
+}
+
+' Relacionamentos
+Menu --> TelaLogin
+Menu --> TelaListaQuartos
+TelaLogin --> Cliente
+TelaCadastro --> Cliente
+TelaListaQuartos --> Quarto
+TelaReserva --> Reserva
+TelaFinalizacaoCompra --> Reserva
+TelaEdicaoReserva --> Reserva
+Reserva --> Cliente
+Reserva --> Quarto
