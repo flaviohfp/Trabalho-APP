@@ -1,0 +1,11 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+actor Usuário
+rectangle Sistema{
+  Usuário -- (Cadastrar)
+  Usuário -- (Reservar quarto)
+  Usuário -- (Edição da Reserva)
+  Usuário -- (Visualizar quartos)
+}
+@enduml
