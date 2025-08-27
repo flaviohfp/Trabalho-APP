@@ -1,0 +1,36 @@
+@startuml
+actor Cliente
+participant Aplicativo
+database DB
+
+== Cadastro do Usuário ==
+Cliente -> Aplicativo: Enviar dados para cadastro
+Aplicativo -> DB: Salvar dados do usuário
+DB --> Aplicativo: Confirma cadastro
+Aplicativo --> Cliente: Mostrar sucesso
+
+== Exibir quartos disponíveis ==
+Cliente -> Aplicativo: Solicitar quartos disponíveis
+Aplicativo -> DB: Consultar quartos disponíveis
+DB --> Aplicativo: Retorna lista de quartos
+Aplicativo --> Cliente: Exibe lista (número, tipo)
+
+== Reservar quarto ==
+Cliente -> Aplicativo: Reservar quarto X
+Aplicativo -> DB: Verificar disponibilidade e reservar
+DB --> Aplicativo: Confirma reserva
+Aplicativo --> Cliente: Confirma reserva
+
+== Cancelar reserva ==
+Cliente -> Aplicativo: Cancelar reserva Y
+Aplicativo -> DB: Cancelar reserva
+DB --> Aplicativo: Confirma cancelamento
+Aplicativo --> Cliente: Confirma cancelamento
+
+== Prolongar reserva ==
+Cliente -> Aplicativo: Prolongar reserva Y
+Aplicativo -> DB: Atualizar data da reserva
+DB --> Aplicativo: Confirma prolongamento
+Aplicativo --> Cliente: Confirma prolongamento
+
+@enduml
