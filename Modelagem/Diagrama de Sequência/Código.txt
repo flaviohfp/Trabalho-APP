@@ -4,33 +4,33 @@ participant Aplicativo
 database DB
 
 == Cadastro do Usuário ==
-Cliente -> Aplicativo: Enviar dados para cadastro
+Cliente -> Aplicativo: Enviar dados de cadastro
 Aplicativo -> DB: Salvar dados do usuário
 DB --> Aplicativo: Confirma cadastro
 Aplicativo --> Cliente: Mostrar sucesso
 
-== Exibir quartos disponíveis ==
-Cliente -> Aplicativo: Solicitar quartos disponíveis
-Aplicativo -> DB: Consultar quartos disponíveis
-DB --> Aplicativo: Retorna lista de quartos
-Aplicativo --> Cliente: Exibe lista (número, tipo)
+== Acesso à tela de aluguel ==
+Cliente -> Aplicativo: Abre tela de aluguel de quartos
+Aplicativo -> DB: Buscar quartos disponíveis
+DB --> Aplicativo: Lista de quartos (número, tipo)
+Aplicativo --> Cliente: Exibe lista de quartos
 
 == Reservar quarto ==
-Cliente -> Aplicativo: Reservar quarto X
-Aplicativo -> DB: Verificar disponibilidade e reservar
+Cliente -> Aplicativo: Seleciona quarto X e confirma reserva
+Aplicativo -> DB: Registrar reserva
 DB --> Aplicativo: Confirma reserva
-Aplicativo --> Cliente: Confirma reserva
+Aplicativo --> Cliente: Reserva efetuada
 
 == Cancelar reserva ==
-Cliente -> Aplicativo: Cancelar reserva Y
+Cliente -> Aplicativo: Solicita cancelamento da reserva Y
 Aplicativo -> DB: Cancelar reserva
 DB --> Aplicativo: Confirma cancelamento
-Aplicativo --> Cliente: Confirma cancelamento
+Aplicativo --> Cliente: Cancelamento efetuado
 
 == Prolongar reserva ==
-Cliente -> Aplicativo: Prolongar reserva Y
-Aplicativo -> DB: Atualizar data da reserva
+Cliente -> Aplicativo: Solicita prolongamento da reserva Y
+Aplicativo -> DB: Atualizar datas da reserva
 DB --> Aplicativo: Confirma prolongamento
-Aplicativo --> Cliente: Confirma prolongamento
+Aplicativo --> Cliente: Prolongamento confirmado
 
 @enduml
