@@ -26,3 +26,33 @@ CREATE TABLE quartos (
     tipo VARCHAR(50) NOT NULL,
     valor NUMERIC(10,2) NOT NULL
 );
+
+-- Inserir quartos
+INSERT INTO quartos (numero, tipo, valor) VALUES
+('101', 'Suíte Luxo', 350.00),
+('102', 'Quarto Standard', 180.00),
+('103', 'Quarto Casal', 250.00),
+('104', 'Quarto Família', 400.00);
+
+-- ============================
+-- 4. Tabela de reservas
+-- ============================
+CREATE TABLE reservas (
+    id SERIAL PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    quarto_id INT NOT NULL,
+    data_inicio DATE NOT NULL,
+    data_fim DATE NOT NULL,
+    valor_total NUMERIC(10,2) NOT NULL,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (quarto_id) REFERENCES quartos(id) ON DELETE CASCADE
+);
+
+-- ============================
+-- 5. Tabela de cardápio
+-- ============================
+CREATE TABLE cardapio (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    valor NUMERIC(10,2) NOT NULL
+);
