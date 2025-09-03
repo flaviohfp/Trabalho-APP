@@ -388,6 +388,21 @@ private void login(String email, String senha) {
 
         return new Scene(layout, 800, 600);
     }
+    private Scene criarTelaReserva(boolean editar) {
+        VBox layout = new VBox(15);
+        layout.setPadding(new Insets(20));
+        layout.setAlignment(Pos.CENTER);
+        layout.setStyle("-fx-background-color: #e0f7fa; -fx-font-family: Arial;");
+
+        Label titulo = new Label(editar ? "Editar Reserva" : "Nova Reserva");
+        Button confirmar = new Button("Confirmar");
+        Button cancelar = new Button("Cancelar");
+
+        layout.getChildren().addAll(titulo, confirmar, cancelar);
+
+        return new Scene(layout, 800, 600);
+    }
+
 
 
 
