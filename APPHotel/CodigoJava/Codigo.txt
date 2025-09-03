@@ -702,10 +702,3 @@ private void login(String email, String senha) {
     }
 }
 
-
-
-
-
-
-
-    }
