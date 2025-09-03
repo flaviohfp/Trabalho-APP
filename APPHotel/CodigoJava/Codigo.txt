@@ -359,6 +359,13 @@ private void login(String email, String senha) {
         stage.show();
     }
     // -------------------- Reserva --------------------
+    private Scene telaReserva() {
+        return criarTelaReserva(false);
+    }
+
+    private Scene telaEditarReserva() {
+        return criarTelaReserva(true);
+    }
     
 
 
