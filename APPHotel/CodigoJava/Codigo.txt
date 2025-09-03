@@ -358,6 +358,8 @@ private void login(String email, String senha) {
         stage.setTitle("Quartos - EasyRoom");
         stage.show();
     }
+
+
     // -------------------- Reserva --------------------
     private Scene telaReserva() {
         return criarTelaReserva(false);
@@ -366,28 +368,7 @@ private void login(String email, String senha) {
     private Scene telaEditarReserva() {
         return criarTelaReserva(true);
     }
-    private Scene criarTelaReserva(boolean editar) {
-        VBox layout = new VBox(15);
-        layout.setPadding(new Insets(20));
-        layout.setAlignment(Pos.CENTER);
-        return new Scene(layout, 800, 600); // tamanho padrão
-    }
-    private Scene criarTelaReserva(boolean editar) {
-        VBox layout = new VBox(15);
-        layout.setPadding(new Insets(20));
-        layout.setAlignment(Pos.CENTER);
-        layout.setStyle("-fx-background-color: #e0f7fa; -fx-font-family: Arial;");
 
-        return new Scene(layout, 800, 600);
-    }
-    private Scene criarTelaReserva(boolean editar) {
-        VBox layout = new VBox(15);
-        layout.setPadding(new Insets(20));
-        layout.setAlignment(Pos.CENTER);
-        layout.setStyle("-fx-background-color: #e0f7fa; -fx-font-family: Arial;");
-
-        return new Scene(layout, 800, 600);
-    }
     private Scene criarTelaReserva(boolean editar) {
         VBox layout = new VBox(15);
         layout.setPadding(new Insets(20));
@@ -395,31 +376,331 @@ private void login(String email, String senha) {
         layout.setStyle("-fx-background-color: #e0f7fa; -fx-font-family: Arial;");
 
         Label titulo = new Label(editar ? "Editar Reserva" : "Nova Reserva");
-        Button confirmar = new Button("Confirmar");
-        Button cancelar = new Button("Cancelar");
+        titulo.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        titulo.setTextFill(Color.web("#00796b"));
 
-        layout.getChildren().addAll(titulo, confirmar, cancelar);
+        Label lblCliente = new Label("Cliente: ");
+        lblCliente.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        lblCliente.setTextFill(Color.web("#004d40"));
+
+        DatePicker dpInicio = new DatePicker(LocalDate.now());
+        dpInicio.setStyle("-fx-font-family: Arial; -fx-border-color: #00796b; -fx-border-radius: 5;");
+        DatePicker dpFim = new DatePicker(LocalDate.now().plusDays(1));
+        dpFim.setStyle("-fx-font-family: Arial; -fx-border-color: #00796b; -fx-border-radius: 5;");
+
+        TextField txtQuarto = new TextField();
+        txtQuarto.setEditable(false);
+        txtQuarto.setPrefWidth(300);
+        txtQuarto.setStyle("-fx-font-family: Arial; -fx-border-color: #00796b; -fx-border-radius: 5;");
+
+        Button btnSelecionarQuarto = criarBotao("Selecionar Quarto", "Escolha um quarto");
+        Button btnCardapio = criarBotao("Cardápio", "Escolha itens do cardápio");
+        Button btnSalvar = criarBotao(editar ? "Atualizar Reserva" : "Confirmar Reserva", "Salvar reserva");
+        Button btnExcluir = criarBotao("Excluir Reserva", "Remover reserva existente");
+        Button btnVoltar = criarBotao("Voltar", "Retornar à tela inicial");
+        Button btnSair = criarBotao("Sair", "Fechar o aplicativo");
+
+        lblValorTotal = new Label("Valor Total: R$0.00");
+        lblValorTotal.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        lblValorTotal.setTextFill(Color.web("#004d40"));
+
+        HBox botoes = new HBox(15, btnSelecionarQuarto, btnCardapio, btnSalvar, btnExcluir, btnVoltar, btnSair);
+        botoes.setAlignment(Pos.CENTER);
+
+        Label lblDataInicio = new Label("Data Início:");
+        lblDataInicio.setStyle("-fx-font-family: Arial; -fx-font-weight: bold; -fx-text-fill: #004d40;");
+
+        Label lblDataFim = new Label("Data Fim:");
+        lblDataFim.setStyle("-fx-font-family: Arial; -fx-font-weight: bold; -fx-text-fill: #004d40;");
+
+        Label lblQuarto = new Label("Quarto:");
+        lblQuarto.setStyle("-fx-font-family: Arial; -fx-font-weight: bold; -fx-text-fill: #004d40;");
+
+        layout.getChildren().addAll(
+                titulo, new Separator(),
+                lblCliente,
+                lblDataInicio, dpInicio,
+                lblDataFim, dpFim,
+                lblQuarto, txtQuarto,
+                botoes, new Separator(), lblValorTotal
+        );
+
+
+        carregarNomeCliente(lblCliente);
+        if (editar) carregarReserva(txtQuarto, dpInicio, dpFim);
+
+        dpInicio.valueProperty().addListener((obs, old, newVal) -> atualizarValorTotal(newVal, dpFim.getValue()));
+        dpFim.valueProperty().addListener((obs, old, newVal) -> atualizarValorTotal(dpInicio.getValue(), newVal));
+
+        btnSelecionarQuarto.setOnAction(e -> selecionarQuarto(dpInicio, dpFim, txtQuarto));
+        btnCardapio.setOnAction(e -> abrirCardapio(dpInicio, dpFim));
+        btnSalvar.setOnAction(e -> salvarReserva(editar, txtQuarto, dpInicio, dpFim));
+        btnExcluir.setOnAction(e -> { if (editar) excluirReserva(); });
+        btnVoltar.setOnAction(e -> atualizarTelaInicial());
+        btnSair.setOnAction(e -> window.close());
 
         return new Scene(layout, 800, 600);
     }
-    private Scene criarTelaReserva(boolean editar) {
-        VBox layout = new VBox(15);
-        layout.setPadding(new Insets(20));
-        layout.setAlignment(Pos.CENTER);
-        layout.setStyle("-fx-background-color: #e0f7fa; -fx-font-family: Arial;");
 
-        Label titulo = new Label(editar ? "Editar Reserva" : "Nova Reserva");
-        Button confirmar = new Button("Confirmar");
-        Button cancelar = new Button("Cancelar");
+    private void carregarNomeCliente(Label lblCliente) {
+        if (usuarioLogadoId == -1) return;
+        try (Connection con = conectar()) {
+            PreparedStatement stmt = con.prepareStatement("SELECT nome FROM usuarios WHERE id=?");
+            stmt.setInt(1, usuarioLogadoId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) lblCliente.setText("Cliente: " + rs.getString("nome"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
-        if (editar) {
-            confirmar.setText("Salvar Alterações");
+    private void carregarReserva(TextField txtQuarto, DatePicker dpInicio, DatePicker dpFim) {
+        try (Connection con = conectar()) {
+            PreparedStatement stmt = con.prepareStatement(
+                    "SELECT r.id, r.data_inicio, r.data_fim, q.numero, q.valor FROM reservas r JOIN quartos q ON r.quarto_id=q.id WHERE usuario_id=?");
+            stmt.setInt(1, usuarioLogadoId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                reservaId = rs.getInt("id");
+                dpInicio.setValue(rs.getDate("data_inicio").toLocalDate());
+                dpFim.setValue(rs.getDate("data_fim").toLocalDate());
+                txtQuarto.setText(rs.getString("numero"));
+                valorQuartoSelecionado = rs.getDouble("valor");
+                pratosSelecionadosIds.clear();
+                valorPratosSelecionados = 0.0;
+                PreparedStatement stmtPratos = con.prepareStatement("SELECT prato_id, valor_unitario FROM itens_reserva WHERE reserva_id=?");
+                stmtPratos.setInt(1, reservaId);
+                ResultSet rsPratos = stmtPratos.executeQuery();
+                while (rsPratos.next()) {
+                    pratosSelecionadosIds.add(rsPratos.getInt("prato_id"));
+                    valorPratosSelecionados += rsPratos.getDouble("valor_unitario");
+                }
+                atualizarValorTotal(dpInicio.getValue(), dpFim.getValue());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void salvarReserva(boolean editar, TextField txtQuarto, DatePicker dpInicio, DatePicker dpFim) {
+        if (txtQuarto.getText().isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Selecione um quarto!");
+            estilizarAlerta(alert);
+            alert.showAndWait();
+            return;
+        }
+        if (dpInicio.getValue() == null || dpFim.getValue() == null || dpFim.getValue().isBefore(dpInicio.getValue())) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Datas inválidas!");
+            estilizarAlerta(alert);
+            alert.showAndWait();
+            return;
+        }
+        long dias = ChronoUnit.DAYS.between(dpInicio.getValue(), dpFim.getValue());
+        if (dias == 0) dias = 1;
+        double total = valorQuartoSelecionado * dias + valorPratosSelecionados;
+        try (Connection con = conectar()) {
+            if (editar) {
+                PreparedStatement stmt = con.prepareStatement(
+                        "UPDATE reservas SET quarto_id=(SELECT id FROM quartos WHERE numero=?),data_inicio=?,data_fim=?,valor_total=? WHERE usuario_id=?");
+                stmt.setString(1, txtQuarto.getText());
+                stmt.setDate(2, Date.valueOf(dpInicio.getValue()));
+                stmt.setDate(3, Date.valueOf(dpFim.getValue()));
+                stmt.setDouble(4, total);
+                stmt.setInt(5, usuarioLogadoId);
+                stmt.executeUpdate();
+                PreparedStatement delItens = con.prepareStatement("DELETE FROM itens_reserva WHERE reserva_id=?");
+                delItens.setInt(1, reservaId);
+                delItens.executeUpdate();
+            } else {
+                PreparedStatement stmt = con.prepareStatement(
+                        "INSERT INTO reservas (usuario_id,quarto_id,data_inicio,data_fim,valor_total) VALUES (?,(SELECT id FROM quartos WHERE numero=?),?,?,?) RETURNING id");
+                stmt.setInt(1, usuarioLogadoId);
+                stmt.setString(2, txtQuarto.getText());
+                stmt.setDate(3, Date.valueOf(dpInicio.getValue()));
+                stmt.setDate(4, Date.valueOf(dpFim.getValue()));
+                stmt.setDouble(5, total);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    reservaId = rs.getInt("id");
+                }
+            }
+            for (int pratoId : pratosSelecionadosIds) {
+                PreparedStatement insItem = con.prepareStatement(
+                        "INSERT INTO itens_reserva (reserva_id, prato_id, valor_unitario) VALUES (?, ?, (SELECT valor FROM cardapio WHERE id=?))");
+                insItem.setInt(1, reservaId);
+                insItem.setInt(2, pratoId);
+                insItem.setInt(3, pratoId);
+                insItem.executeUpdate();
+            }
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, editar ? "Reserva atualizada com sucesso!" : "Reserva realizada com sucesso!");
+            estilizarAlerta(alert);
+            alert.showAndWait();
+            valorPratosSelecionados = 0.0;
+            valorQuartoSelecionado = 0.0;
+            pratosSelecionadosIds.clear();
+            lblValorTotal.setText("Valor Total: R$0.00");
+            atualizarTelaInicial();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao salvar reserva!");
+            estilizarAlerta(alert);
+            alert.showAndWait();
+        }
+    }
+
+    private void excluirReserva() {
+        try (Connection con = conectar()) {
+            PreparedStatement stmt = con.prepareStatement("DELETE FROM reservas WHERE usuario_id=?");
+            stmt.setInt(1, usuarioLogadoId);
+            stmt.executeUpdate();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Reserva excluída!");
+            estilizarAlerta(alert);
+            alert.showAndWait();
+            valorPratosSelecionados = 0.0;
+            valorQuartoSelecionado = 0.0;
+            pratosSelecionadosIds.clear();
+            lblValorTotal.setText("Valor Total: R$0.00");
+            atualizarTelaInicial();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void atualizarValorTotal(LocalDate inicio, LocalDate fim) {
+        if (inicio == null || fim == null) return;
+        long dias = ChronoUnit.DAYS.between(inicio, fim);
+        if (dias == 0) dias = 1;
+        lblValorTotal.setText("Valor Total: R$" + String.format("%.2f", valorQuartoSelecionado * dias + valorPratosSelecionados));
+    }
+
+    private void selecionarQuarto(DatePicker dpInicio, DatePicker dpFim, TextField txtQuarto) {
+        Stage stage = new Stage();
+        VBox v = new VBox(15);
+        v.setPadding(new Insets(20));
+        v.setAlignment(Pos.CENTER);
+        Label titulo = new Label("Selecionar Quarto");
+        titulo.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        titulo.setTextFill(Color.web("#00796b"));
+        v.getChildren().add(titulo);
+        v.getChildren().add(new Separator());
+
+        ToggleGroup tg = new ToggleGroup();
+        try (Connection con = conectar()) {
+            PreparedStatement stmt = con.prepareStatement("SELECT * FROM quartos ORDER BY numero");
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                String numero = rs.getString("numero");
+                String tipo = rs.getString("tipo");
+                double valor = rs.getDouble("valor");
+                RadioButton rb = new RadioButton(numero + " - " + tipo + " - R$" + String.format("%.2f", valor));
+                rb.setFont(Font.font("Arial", 14));
+                rb.setUserData(valor);
+                rb.setToggleGroup(tg);
+                v.getChildren().add(rb);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao carregar quartos!");
+            estilizarAlerta(alert);
+            alert.showAndWait();
         }
 
-        layout.getChildren().addAll(titulo, confirmar, cancelar);
+        Button btnOk = criarBotao("Selecionar", "Confirmar seleção do quarto");
+        Button btnFechar = criarBotao("Fechar", "Fechar a janela");
+        HBox botoes = new HBox(15, btnOk, btnFechar);
+        botoes.setAlignment(Pos.CENTER);
+        v.getChildren().add(new Separator());
+        v.getChildren().add(botoes);
 
-        return new Scene(layout, 800, 600);
+        btnOk.setOnAction(e -> {
+            RadioButton sel = (RadioButton) tg.getSelectedToggle();
+            if (sel != null) {
+                quartoSelecionado = sel.getText().split(" - ")[0];
+                txtQuarto.setText(quartoSelecionado);
+                valorQuartoSelecionado = (double) sel.getUserData();
+                atualizarValorTotal(dpInicio.getValue(), dpFim.getValue());
+                stage.close();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Selecione um quarto!");
+                estilizarAlerta(alert);
+                alert.showAndWait();
+            }
+        });
+        btnFechar.setOnAction(e -> stage.close());
+
+        Scene scene = new Scene(new ScrollPane(v), 600, 500);
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.centerOnScreen();
+        stage.setTitle("Seleção de Quarto - EasyRoom");
+        stage.show();
     }
+
+    private void abrirCardapio(DatePicker dpInicio, DatePicker dpFim) {
+        Stage stage = new Stage();
+        VBox v = new VBox(15);
+        v.setPadding(new Insets(20));
+        v.setAlignment(Pos.CENTER);
+        Label titulo = new Label("Cardápio do Hotel");
+        titulo.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        titulo.setTextFill(Color.web("#00796b"));
+        v.getChildren().add(titulo);
+        v.getChildren().add(new Separator());
+
+        List<CheckBox> cbList = new ArrayList<>();
+        try (Connection con = conectar()) {
+            PreparedStatement stmt = con.prepareStatement("SELECT * FROM cardapio ORDER BY nome");
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                double valor = rs.getDouble("valor");
+                CheckBox cb = new CheckBox(rs.getString("nome") + " - R$" + String.format("%.2f", valor));
+                cb.setFont(Font.font("Arial", 14));
+                cb.setUserData(new Object[]{id, valor});
+                if (pratosSelecionadosIds.contains(id)) cb.setSelected(true);
+                cbList.add(cb);
+                v.getChildren().add(cb);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao carregar cardápio!");
+            estilizarAlerta(alert);
+            alert.showAndWait();
+        }
+
+        Button btnConfirm = criarBotao("Confirmar", "Confirmar seleção do cardápio");
+        Button btnFechar = criarBotao("Fechar", "Fechar a janela");
+        HBox botoes = new HBox(15, btnConfirm, btnFechar);
+        botoes.setAlignment(Pos.CENTER);
+        v.getChildren().add(new Separator());
+        v.getChildren().add(botoes);
+
+        btnConfirm.setOnAction(ev -> {
+            pratosSelecionadosIds.clear();
+            double total = 0;
+            for (CheckBox cb : cbList) {
+                if (cb.isSelected()) {
+                    Object[] data = (Object[]) cb.getUserData();
+                    int id = (int) data[0];
+                    double val = (double) data[1];
+                    total += val;
+                    pratosSelecionadosIds.add(id);
+                }
+            }
+            valorPratosSelecionados = total;
+            atualizarValorTotal(dpInicio.getValue(), dpFim.getValue());
+            stage.close();
+        });
+        btnFechar.setOnAction(e -> stage.close());
+
+        Scene scene = new Scene(new ScrollPane(v), 600, 500);
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.centerOnScreen();
+        stage.setTitle("Cardápio - EasyRoom");
+        stage.show();
+    }
+}
 
 
 
