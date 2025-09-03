@@ -56,3 +56,28 @@ public class HotelApp extends Application {
             return null;
         }
     }
+
+
+
+    // Estilizar alerts
+    private void estilizarAlerta(Alert alert) {
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.setStyle("-fx-background-color: #e0f7fa; -fx-font-family: Arial; -fx-font-size: 14px;");
+        dialogPane.lookupButton(ButtonType.OK).setStyle(
+                "-fx-background-color: #00796b; -fx-text-fill: white; -fx-background-radius: 10;"
+        );
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        window = primaryStage;
+        criarTelaLogin();
+        criarTelaCadastro();
+        criarTelaInicial();
+
+        window.setScene(telaInicial);
+        window.setTitle("EasyRoom - Hotel");
+        window.setResizable(false);
+        window.show();
+        window.centerOnScreen();
+    }
