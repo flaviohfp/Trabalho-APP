@@ -260,3 +260,58 @@ private void login(String email, String senha) {
 
         telaCadastro = new Scene(layout, 800, 600);
     }
+
+
+    private void cadastrar(String nome, String telefone, String email, String senha) {
+        if (nome.isEmpty() || email.isEmpty() || senha.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Preencha todos os campos!");
+            estilizarAlerta(alert);
+            alert.showAndWait();
+            return;
+        }
+        try (Connection con = conectar()) {
+            PreparedStatement stmt = con.prepareStatement("INSERT INTO usuarios (nome, telefone, email, senha) VALUES (?,?,?,?) RETURNING id");
+            stmt.setString(1, nome);
+            stmt.setString(2, telefone);
+            stmt.setString(3, email);
+            stmt.setString(4, senha);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                usuarioLogadoId = rs.getInt("id");
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Cadastro realizado com sucesso!");
+                estilizarAlerta(alert);
+                alert.showAndWait();
+                atualizarTelaInicial();
+            }
+        } catch (SQLException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao cadastrar! Verifique se o email já está em uso.");
+            estilizarAlerta(alert);
+            alert.showAndWait();
+        }
+    }
+
+    private GridPane criarGrid() {
+        GridPane g = new GridPane();
+        g.setHgap(15);
+        g.setVgap(15);
+        g.setAlignment(Pos.CENTER);
+        g.setPadding(new Insets(30));
+        g.setStyle("-fx-background-color: #e0f7fa; -fx-font-family: Arial;");
+        return g;
+    }
+
+    private TextField criarCampo(GridPane layout, String texto, int linha) {
+        return (TextField) criarCampo(layout, texto, linha, false);
+    }
+
+    private TextField criarCampo(GridPane layout, String texto, int linha, boolean senha) {
+        Label lbl = new Label(texto);
+        lbl.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+        lbl.setTextFill(Color.web("#004d40"));
+        TextField campo = senha ? new PasswordField() : new TextField();
+        campo.setPrefWidth(300);
+        campo.setStyle("-fx-background-color: #ffffff; -fx-border-color: #00796b; -fx-border-radius: 5; -fx-font-family: Arial;");
+        layout.add(lbl, 0, linha);
+        layout.add(campo, 1, linha);
+        return campo;
+    }
