@@ -151,3 +151,19 @@ public class HotelApp extends Application {
 
 
 
+private boolean possuiReserva(int usuarioId) {
+        if (usuarioId == -1) return false;
+        try (Connection con = conectar()) {
+            PreparedStatement stmt = con.prepareStatement("SELECT COUNT(*) FROM reservas WHERE usuario_id = ?");
+            stmt.setInt(1, usuarioId);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next() && rs.getInt(1) > 0;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    private void atualizarTelaInicial() {
+        criarTelaInicial();
+        window.setScene(telaInicial);
+    }
