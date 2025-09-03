@@ -186,3 +186,17 @@ private boolean possuiReserva(int usuarioId) {
         Button btnIrCadastro = criarBotao("Criar Conta", "Registre-se no sistema");
         Button btnVoltar = criarBotao("Voltar", "Retornar à tela inicial");
         Button btnSair = criarBotao("Sair", "Fechar o aplicativo");
+
+
+
+ HBox botoes = new HBox(15, btnVoltar, btnEntrar, btnIrCadastro, btnSair);
+        botoes.setAlignment(Pos.CENTER);
+        layout.add(botoes, 0, 3, 2, 1);
+
+        btnEntrar.setOnAction(e -> login(txtEmail.getText(), txtSenha.getText()));
+        btnIrCadastro.setOnAction(e -> window.setScene(telaCadastro));
+        btnVoltar.setOnAction(e -> window.setScene(telaInicial));
+        btnSair.setOnAction(e -> window.close());
+
+        telaLogin = new Scene(layout, 800, 600);
+    }
