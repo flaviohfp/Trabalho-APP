@@ -314,4 +314,50 @@ private void login(String email, String senha) {
         layout.add(lbl, 0, linha);
         layout.add(campo, 1, linha);
         return campo;
+
+    // -------------------- Quartos --------------------
+    private void mostrarQuartos() {
+        Stage stage = new Stage();
+        VBox v = new VBox(15);
+        v.setPadding(new Insets(20));
+        v.setAlignment(Pos.CENTER);
+        Label titulo = new Label("Quartos Disponíveis");
+        titulo.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        titulo.setTextFill(Color.web("#00796b"));
+        v.getChildren().add(titulo);
+        v.getChildren().add(new Separator());
+
+        try (Connection con = conectar()) {
+            PreparedStatement stmt = con.prepareStatement("SELECT * FROM quartos ORDER BY numero");
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                String numero = rs.getString("numero");
+                String tipo = rs.getString("tipo");
+                double valor = rs.getDouble("valor");
+                Label lbl = new Label(numero + " - " + tipo + " - R$" + String.format("%.2f", valor));
+                lbl.setFont(Font.font("Arial", 14));
+                v.getChildren().add(lbl);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao carregar quartos!");
+            estilizarAlerta(alert);
+            alert.showAndWait();
+        }
+
+        Button btnFechar = criarBotao("Fechar", "Fechar a janela");
+        v.getChildren().add(new Separator());
+        v.getChildren().add(btnFechar);
+
+        btnFechar.setOnAction(e -> stage.close());
+
+        Scene scene = new Scene(new ScrollPane(v), 600, 500);
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.centerOnScreen();
+        stage.setTitle("Quartos - EasyRoom");
+        stage.show();
+    }
+
+
     }
