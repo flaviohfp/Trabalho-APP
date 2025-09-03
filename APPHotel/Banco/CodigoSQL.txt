@@ -20,3 +20,23 @@ CREATE TABLE quartos (
     tipo VARCHAR(50) NOT NULL,
     valor NUMERIC(10,2) NOT NULL
 );
+
+INSERT INTO quartos (numero, tipo, valor) VALUES
+('101', 'Solteiro', 150.00),
+('102', 'Duplo', 200.00),
+('201', 'Suite', 350.00),
+('202', 'Presidencial', 500.00);
+
+-- -------------------- Tabela cardapio --------------------
+CREATE TABLE cardapio (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    valor NUMERIC(10,2) NOT NULL
+);
+
+-- Inserindo alguns pratos de exemplo
+INSERT INTO cardapio (nome, valor) VALUES
+('Café da Manhã', 25.00),
+('Almoço Executivo', 40.00),
+('Jantar Especial', 60.00),
+('Sobremesa', 15.00);
