@@ -37,3 +37,22 @@ public class HotelApp extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+
+
+
+
+    // -------------------- Conexão --------------------
+    private Connection conectar() {
+        try {
+            return DriverManager.getConnection(
+                    "jdbc:postgresql://localhost:5432/Hotel_db",
+                    "postgres",
+                    "root"
+            );
+        } catch (SQLException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao conectar ao banco! Verifique se o PostgreSQL está rodando.");
+            estilizarAlerta(alert);
+            alert.showAndWait();
+            return null;
+        }
+    }
