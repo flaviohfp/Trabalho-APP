@@ -230,3 +230,33 @@ private void login(String email, String senha) {
             e.printStackTrace();
         }
     }
+
+
+
+    // -------------------- Tela Cadastro --------------------
+    private void criarTelaCadastro() {
+        GridPane layout = criarGrid();
+        Label titulo = new Label("Cadastro");
+        titulo.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        titulo.setTextFill(Color.web("#00796b"));
+        layout.add(titulo, 0, 0, 2, 1);
+        GridPane.setHalignment(titulo, HPos.CENTER);
+
+        TextField txtNome = criarCampo(layout, "Nome:", 1);
+        TextField txtTelefone = criarCampo(layout, "Telefone:", 2);
+        TextField txtEmail = criarCampo(layout, "Email:", 3);
+        PasswordField txtSenha = (PasswordField) criarCampo(layout, "Senha:", 4, true);
+        Button btnCadastrar = criarBotao("Cadastrar", "Registre-se no sistema");
+        Button btnVoltar = criarBotao("Voltar", "Retornar à tela inicial");
+        Button btnSair = criarBotao("Sair", "Fechar o aplicativo");
+
+        HBox botoes = new HBox(15, btnVoltar, btnCadastrar, btnSair);
+        botoes.setAlignment(Pos.CENTER);
+        layout.add(botoes, 0, 5, 2, 1);
+
+        btnCadastrar.setOnAction(e -> cadastrar(txtNome.getText(), txtTelefone.getText(), txtEmail.getText(), txtSenha.getText()));
+        btnVoltar.setOnAction(e -> window.setScene(telaInicial));
+        btnSair.setOnAction(e -> window.close());
+
+        telaCadastro = new Scene(layout, 800, 600);
+    }
