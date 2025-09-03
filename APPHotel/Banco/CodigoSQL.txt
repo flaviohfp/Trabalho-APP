@@ -40,3 +40,20 @@ INSERT INTO cardapio (nome, valor) VALUES
 ('Almoço Executivo', 40.00),
 ('Jantar Especial', 60.00),
 ('Sobremesa', 15.00);
+
+-- -------------------- Tabela reservas --------------------
+CREATE TABLE reservas (
+    id SERIAL PRIMARY KEY,
+    usuario_id INT NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    quarto_id INT NOT NULL REFERENCES quartos(id),
+    data_inicio DATE NOT NULL,
+    data_fim DATE NOT NULL,
+    valor_total NUMERIC(10,2) NOT NULL
+);
+
+-- -------------------- Tabela itens_reserva --------------------
+CREATE TABLE itens_reserva (
+    id SERIAL PRIMARY KEY,
+    reserva_id INT NOT NULL REFERENCES reservas(id) ON DELETE CASCADE,
+    prato_id INT NOT NULL REFERENCES cardapio(id),
+    valor_unitario NUMERIC(10,2) NOT NULL
