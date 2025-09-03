@@ -56,3 +56,33 @@ CREATE TABLE cardapio (
     nome VARCHAR(100) NOT NULL,
     valor NUMERIC(10,2) NOT NULL
 );
+
+
+-- Inserir pratos de exemplo
+INSERT INTO cardapio (nome, valor) VALUES
+('Omelete + Suco', 15.00),
+('Pão + Café', 10.00),
+('Arroz + Feijão + Carne', 25.00),
+('Suco Natural', 12.00),
+('Salada', 18.00);
+
+-- ============================
+-- 6. Tabela de itens de reserva (opcional)
+-- para guardar pratos selecionados em cada reserva
+-- ============================
+CREATE TABLE itens_reserva (
+    id SERIAL PRIMARY KEY,
+    reserva_id INT NOT NULL,
+    prato_id INT NOT NULL,
+    quantidade INT DEFAULT 1,
+    valor_unitario NUMERIC(10,2) NOT NULL,
+    FOREIGN KEY (reserva_id) REFERENCES reservas(id) ON DELETE CASCADE,
+    FOREIGN KEY (prato_id) REFERENCES cardapio(id) ON DELETE CASCADE
+);
+
+-- ============================
+-- 7. Inserir usuário de teste
+-- ============================
+INSERT INTO usuarios (nome, telefone, email, senha) VALUES
+('Mateus', '11999999999', 'mateus@gmail.com', '123456');
+
