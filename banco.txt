@@ -1,0 +1,28 @@
+-- ============================
+-- 1. Criar o banco de dados
+-- ============================
+CREATE DATABASE Hotel_db;
+
+-- Conectar ao banco
+\c Hotel_db;
+
+-- ============================
+-- 2. Tabela de usuários
+-- ============================
+CREATE TABLE usuarios (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    telefone VARCHAR(20),
+    email VARCHAR(100) UNIQUE NOT NULL,
+    senha VARCHAR(100) NOT NULL
+);
+
+-- ============================
+-- 3. Tabela de quartos
+-- ============================
+CREATE TABLE quartos (
+    id SERIAL PRIMARY KEY,
+    numero VARCHAR(20) UNIQUE NOT NULL,
+    tipo VARCHAR(50) NOT NULL,
+    valor NUMERIC(10,2) NOT NULL
+);
