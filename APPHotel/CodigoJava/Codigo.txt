@@ -97,3 +97,27 @@ public class HotelApp extends Application {
         titulo.setFont(Font.font("Arial", FontWeight.BOLD, 32));
         titulo.setTextFill(Color.web("#00796b"));
 
+
+// Botoes
+
+
+ Button btnLogin = criarBotao("Login", "Acesse sua conta");
+        Button btnReserva = criarBotao(possuiReserva(usuarioLogadoId) ? "Editar Reserva" : "Fazer Reserva", "Gerencie suas reservas");
+        Button btnVerQuartos = criarBotao("Ver Quartos", "Explore nossos quartos");
+        Button btnSair = criarBotao("Sair", "Fechar o aplicativo");
+
+        VBox botoes = new VBox(15, btnLogin, btnReserva, btnVerQuartos, btnSair);
+        botoes.setAlignment(Pos.CENTER);
+
+        layout.getChildren().addAll(titulo, new Separator(), botoes);
+        if (usuarioLogadoId == -1) {
+            btnReserva.setVisible(false);
+        }
+
+        btnLogin.setOnAction(e -> window.setScene(telaLogin));
+        btnReserva.setOnAction(e -> window.setScene(possuiReserva(usuarioLogadoId) ? telaEditarReserva() : telaReserva()));
+        btnVerQuartos.setOnAction(e -> mostrarQuartos());
+        btnSair.setOnAction(e -> window.close());
+
+        telaInicial = new Scene(layout, 800, 600);
+    }
