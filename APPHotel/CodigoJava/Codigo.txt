@@ -121,3 +121,33 @@ public class HotelApp extends Application {
 
         telaInicial = new Scene(layout, 800, 600);
     }
+
+
+
+
+ private Button criarBotao(String texto, String tooltip) {
+        Button btn = new Button(texto);
+        btn.setPrefWidth(250);
+        btn.setStyle(
+                "-fx-background-color: #00796b; -fx-text-fill: white; -fx-font-size: 16; " +
+                        "-fx-background-radius: 15; -fx-padding: 10; -fx-font-family: Arial; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 2);"
+        );
+        btn.setOnMouseEntered(e -> btn.setStyle(
+                "-fx-background-color: #004d40; -fx-text-fill: white; -fx-font-size: 16; " +
+                        "-fx-background-radius: 15; -fx-padding: 10; -fx-font-family: Arial; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 8, 0, 0, 3);"
+        ));
+        btn.setOnMouseExited(e -> btn.setStyle(
+                "-fx-background-color: #00796b; -fx-text-fill: white; -fx-font-size: 16; " +
+                        "-fx-background-radius: 15; -fx-padding: 10; -fx-font-family: Arial; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 2);"
+        ));
+        if (tooltip != null) {
+            btn.setTooltip(new Tooltip(tooltip));
+        }
+        return btn;
+    }
+
+
+
