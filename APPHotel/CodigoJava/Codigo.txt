@@ -167,3 +167,22 @@ private boolean possuiReserva(int usuarioId) {
         criarTelaInicial();
         window.setScene(telaInicial);
     }
+
+
+
+    
+    // -------------------- Tela Login --------------------
+    private void criarTelaLogin() {
+        GridPane layout = criarGrid();
+        Label titulo = new Label("Login");
+        titulo.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        titulo.setTextFill(Color.web("#00796b"));
+        layout.add(titulo, 0, 0, 2, 1);
+        GridPane.setHalignment(titulo, HPos.CENTER);
+
+        TextField txtEmail = criarCampo(layout, "Email:", 1);
+        PasswordField txtSenha = (PasswordField) criarCampo(layout, "Senha:", 2, true);
+        Button btnEntrar = criarBotao("Entrar", "Acesse sua conta");
+        Button btnIrCadastro = criarBotao("Criar Conta", "Registre-se no sistema");
+        Button btnVoltar = criarBotao("Voltar", "Retornar à tela inicial");
+        Button btnSair = criarBotao("Sair", "Fechar o aplicativo");
