@@ -1,0 +1,52 @@
+@startuml
+actor Cliente
+participant Aplicativo
+database DB
+
+== Login / Cadastro ==
+Cliente -> Aplicativo: Acessa tela de login
+Cliente -> Aplicativo: Insere dados de login
+Aplicativo -> DB: Verificar credenciais
+alt Login válido
+    DB --> Aplicativo: Confirma login
+    Aplicativo --> Cliente: Acesso permitido
+else Login inválido
+    Aplicativo --> Cliente: Opção de cadastro
+    Cliente -> Aplicativo: Enviar dados para cadastro
+    Aplicativo -> DB: Salvar novo usuário
+    DB --> Aplicativo: Confirma cadastro
+    Aplicativo --> Cliente: Cadastro realizado com sucesso
+end
+
+== Ver quartos disponíveis ==
+Cliente -> Aplicativo: Solicita visualizar quartos
+Aplicativo -> DB: Buscar lista de quartos disponíveis
+DB --> Aplicativo: Retorna lista de quartos
+Aplicativo --> Cliente: Exibe quartos disponíveis
+
+== Reservar quarto (após login) ==
+Cliente -> Aplicativo: Seleciona tempo de hospedagem
+Cliente -> Aplicativo: Seleciona tipo e número do quarto
+Cliente -> Aplicativo: Seleciona cardápio de comida
+Aplicativo -> DB: Calcular valor total
+DB --> Aplicativo: Retorna valor total
+Aplicativo --> Cliente: Exibe valor total
+Cliente -> Aplicativo: Confirma reserva
+Aplicativo -> DB: Registrar reserva
+DB --> Aplicativo: Confirma reserva
+Aplicativo --> Cliente: Reserva efetuada com sucesso
+
+== Editar reserva ==
+Cliente -> Aplicativo: Abre tela de edição da reserva
+Aplicativo -> DB: Buscar dados da reserva
+DB --> Aplicativo: Retorna dados da reserva
+Aplicativo --> Cliente: Exibe detalhes da reserva
+Cliente -> Aplicativo: Atualiza tempo de hospedagem
+Cliente -> Aplicativo: Adiciona novo cardápio de comida
+Cliente -> Aplicativo: Solicita exclusão da reserva (opcional)
+Cliente -> Aplicativo: Clica em atualizar
+Aplicativo -> DB: Atualizar dados da reserva
+DB --> Aplicativo: Confirma atualização
+Aplicativo --> Cliente: Atualização efetuada com sucesso
+
+@enduml
