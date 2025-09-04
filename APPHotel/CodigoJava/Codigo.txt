@@ -1,6 +1,7 @@
 
-package hotel;
+        package hotel;
 
+// Importação das bibliotecas necessárias para a interface gráfica (JavaFX), manipulação de banco de dados (SQL), e gerenciamento de datas
 import javafx.application.Application;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -19,30 +20,35 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe principal que implementa a aplicação JavaFX para o sistema de gerenciamento de hotel
 public class HotelApp extends Application {
-    private Stage window;
-    private int usuarioLogadoId = -1;
-    private int reservaId = -1;
-    private double valorQuartoSelecionado = 0.0;
-    private double valorPratosSelecionados = 0.0;
-    private String quartoSelecionado = "";
-    private List<Integer> pratosSelecionadosIds = new ArrayList<>();
-    private Label lblValorTotal = new Label("Valor Total: R$0.00");
-    private Scene telaInicial, telaLogin, telaCadastro;
+    // Variáveis de instância para gerenciar o estado da aplicação
+    private Stage window; // Janela principal da aplicação
+    private int usuarioLogadoId = -1; // ID do usuário logado, inicializado como -1 (nenhum usuário logado)
+    private int reservaId = -1; // ID da reserva atual, inicializado como -1 (nenhuma reserva selecionada)
+    private double valorQuartoSelecionado = 0.0; // Valor total do quarto selecionado
+    private double valorPratosSelecionados = 0.0; // Valor total dos pratos selecionados no cardápio
+    private String quartoSelecionado = ""; // Número do quarto selecionado
+    private List<Integer> pratosSelecionadosIds = new ArrayList<>(); // Lista de IDs dos pratos selecionados
+    private Label lblValorTotal = new Label("Valor Total: R$0.00"); // Label para exibir o valor total da reserva
+    private Scene telaInicial, telaLogin, telaCadastro; // Cenas principais da aplicação
 
+    // Método principal para iniciar a aplicação JavaFX
     public static void main(String[] args) {
         launch(args);
     }
 
-    // -------------------- Conexão --------------------
+    // -------------------- Conexão com Banco de Dados --------------------
+    // Método para estabelecer conexão com o banco de dados PostgreSQL
     private Connection conectar() {
         try {
             return DriverManager.getConnection(
                     "jdbc:postgresql://localhost:5432/Hotel_db",
-                    "postgres",
-                    "Flavin7."
+                    "postgres",  //usuario
+                    "root"   //senha
             );
         } catch (SQLException e) {
+            // Exibe um alerta em caso de falha na conexão com o banco
             Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao conectar ao banco! Verifique se o PostgreSQL está rodando.");
             estilizarAlerta(alert);
             alert.showAndWait();
@@ -50,7 +56,7 @@ public class HotelApp extends Application {
         }
     }
 
-    // Estilizar alerts
+    // Método para estilizar alertas exibidos na aplicação
     private void estilizarAlerta(Alert alert) {
         DialogPane dialogPane = alert.getDialogPane();
         dialogPane.setStyle("-fx-background-color: #e0f7fa; -fx-font-family: Arial; -fx-font-size: 14px;");
@@ -59,44 +65,51 @@ public class HotelApp extends Application {
         );
     }
 
+    // Método principal da aplicação JavaFX, inicializa a janela e as telas
     @Override
     public void start(Stage primaryStage) {
         window = primaryStage;
-        criarTelaLogin();
-        criarTelaCadastro();
-        criarTelaInicial();
+        criarTelaLogin(); // Cria a tela de login
+        criarTelaCadastro(); // Cria a tela de cadastro
+        criarTelaInicial(); // Cria a tela inicial
 
-        window.setScene(telaInicial);
-        window.setTitle("EasyRoom - Hotel");
-        window.setResizable(false);
-        window.show();
-        window.centerOnScreen();
+        window.setScene(telaInicial); // Define a tela inicial como a cena inicial
+        window.setTitle("EasyRoom - Hotel"); // Define o título da janela
+        window.setResizable(false); // Impede redimensionamento da janela
+        window.show(); // Exibe a janela
+        window.centerOnScreen(); // Centraliza a janela na tela
     }
 
     // -------------------- Tela Inicial --------------------
+    // Método para criar a tela inicial da aplicação
     private void criarTelaInicial() {
         VBox layout = new VBox(20);
         layout.setAlignment(Pos.CENTER);
         layout.setPadding(new Insets(30));
         layout.setStyle("-fx-background-color: linear-gradient(to bottom, #b2ebf2, #e0f7fa);");
 
+        // Cria o título da tela inicial
         Label titulo = new Label("EasyRoom Hotel");
         titulo.setFont(Font.font("Arial", FontWeight.BOLD, 32));
         titulo.setTextFill(Color.web("#00796b"));
 
+        // Cria botões da tela inicial
         Button btnLogin = criarBotao("Login", "Acesse sua conta");
         Button btnReserva = criarBotao(possuiReserva(usuarioLogadoId) ? "Editar Reserva" : "Fazer Reserva", "Gerencie suas reservas");
         Button btnVerQuartos = criarBotao("Ver Quartos", "Explore nossos quartos");
         Button btnSair = criarBotao("Sair", "Fechar o aplicativo");
 
+        // Organiza os botões em um layout vertical
         VBox botoes = new VBox(15, btnLogin, btnReserva, btnVerQuartos, btnSair);
         botoes.setAlignment(Pos.CENTER);
 
+        // Adiciona elementos ao layout principal
         layout.getChildren().addAll(titulo, new Separator(), botoes);
         if (usuarioLogadoId == -1) {
-            btnReserva.setVisible(false);
+            btnReserva.setVisible(false); // Oculta o botão de reserva se não houver usuário logado
         }
 
+        // Define ações para os botões
         btnLogin.setOnAction(e -> window.setScene(telaLogin));
         btnReserva.setOnAction(e -> window.setScene(possuiReserva(usuarioLogadoId) ? telaEditarReserva() : telaReserva()));
         btnVerQuartos.setOnAction(e -> mostrarQuartos());
@@ -105,6 +118,7 @@ public class HotelApp extends Application {
         telaInicial = new Scene(layout, 800, 600);
     }
 
+    // Método para criar botões estilizados com tooltip
     private Button criarBotao(String texto, String tooltip) {
         Button btn = new Button(texto);
         btn.setPrefWidth(250);
@@ -129,6 +143,7 @@ public class HotelApp extends Application {
         return btn;
     }
 
+    // Método para verificar se o usuário possui uma reserva ativa
     private boolean possuiReserva(int usuarioId) {
         if (usuarioId == -1) return false;
         try (Connection con = conectar()) {
@@ -141,12 +156,14 @@ public class HotelApp extends Application {
         }
     }
 
+    // Método para atualizar a tela inicial após alterações no estado da aplicação
     private void atualizarTelaInicial() {
         criarTelaInicial();
         window.setScene(telaInicial);
     }
 
-    // -------------------- Tela Login --------------------
+    // -------------------- Tela de Login --------------------
+    // Método para criar a tela de login
     private void criarTelaLogin() {
         GridPane layout = criarGrid();
         Label titulo = new Label("Login");
@@ -155,6 +172,7 @@ public class HotelApp extends Application {
         layout.add(titulo, 0, 0, 2, 1);
         GridPane.setHalignment(titulo, HPos.CENTER);
 
+        // Cria campos de entrada para email e senha
         TextField txtEmail = criarCampo(layout, "Email:", 1);
         PasswordField txtSenha = (PasswordField) criarCampo(layout, "Senha:", 2, true);
         Button btnEntrar = criarBotao("Entrar", "Acesse sua conta");
@@ -162,10 +180,12 @@ public class HotelApp extends Application {
         Button btnVoltar = criarBotao("Voltar", "Retornar à tela inicial");
         Button btnSair = criarBotao("Sair", "Fechar o aplicativo");
 
+        // Organiza os botões em um layout horizontal
         HBox botoes = new HBox(15, btnVoltar, btnEntrar, btnIrCadastro, btnSair);
         botoes.setAlignment(Pos.CENTER);
         layout.add(botoes, 0, 3, 2, 1);
 
+        // Define ações para os botões
         btnEntrar.setOnAction(e -> login(txtEmail.getText(), txtSenha.getText()));
         btnIrCadastro.setOnAction(e -> window.setScene(telaCadastro));
         btnVoltar.setOnAction(e -> window.setScene(telaInicial));
@@ -174,6 +194,7 @@ public class HotelApp extends Application {
         telaLogin = new Scene(layout, 800, 600);
     }
 
+    // Método para realizar o login do usuário
     private void login(String email, String senha) {
         if (email.isEmpty() || senha.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Preencha todos os campos!");
@@ -202,7 +223,8 @@ public class HotelApp extends Application {
         }
     }
 
-    // -------------------- Tela Cadastro --------------------
+    // -------------------- Tela de Cadastro --------------------
+    // Método para criar a tela de cadastro
     private void criarTelaCadastro() {
         GridPane layout = criarGrid();
         Label titulo = new Label("Cadastro");
@@ -211,6 +233,7 @@ public class HotelApp extends Application {
         layout.add(titulo, 0, 0, 2, 1);
         GridPane.setHalignment(titulo, HPos.CENTER);
 
+        // Cria campos de entrada para nome, telefone, email e senha
         TextField txtNome = criarCampo(layout, "Nome:", 1);
         TextField txtTelefone = criarCampo(layout, "Telefone:", 2);
         TextField txtEmail = criarCampo(layout, "Email:", 3);
@@ -219,10 +242,12 @@ public class HotelApp extends Application {
         Button btnVoltar = criarBotao("Voltar", "Retornar à tela inicial");
         Button btnSair = criarBotao("Sair", "Fechar o aplicativo");
 
+        // Organiza os botões em um layout horizontal
         HBox botoes = new HBox(15, btnVoltar, btnCadastrar, btnSair);
         botoes.setAlignment(Pos.CENTER);
         layout.add(botoes, 0, 5, 2, 1);
 
+        // Define ações para os botões
         btnCadastrar.setOnAction(e -> cadastrar(txtNome.getText(), txtTelefone.getText(), txtEmail.getText(), txtSenha.getText()));
         btnVoltar.setOnAction(e -> window.setScene(telaInicial));
         btnSair.setOnAction(e -> window.close());
@@ -230,6 +255,7 @@ public class HotelApp extends Application {
         telaCadastro = new Scene(layout, 800, 600);
     }
 
+    // Método para cadastrar um novo usuário
     private void cadastrar(String nome, String telefone, String email, String senha) {
         if (nome.isEmpty() || email.isEmpty() || senha.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Preencha todos os campos!");
@@ -258,6 +284,7 @@ public class HotelApp extends Application {
         }
     }
 
+    // Método para criar um layout de grade estilizado
     private GridPane criarGrid() {
         GridPane g = new GridPane();
         g.setHgap(15);
@@ -268,10 +295,12 @@ public class HotelApp extends Application {
         return g;
     }
 
+    // Método sobrecarregado para criar campos de texto
     private TextField criarCampo(GridPane layout, String texto, int linha) {
         return (TextField) criarCampo(layout, texto, linha, false);
     }
 
+    // Método para criar campos de texto ou senha estilizados
     private TextField criarCampo(GridPane layout, String texto, int linha, boolean senha) {
         Label lbl = new Label(texto);
         lbl.setFont(Font.font("Arial", FontWeight.BOLD, 14));
@@ -284,7 +313,8 @@ public class HotelApp extends Application {
         return campo;
     }
 
-    // -------------------- Quartos --------------------
+    // -------------------- Exibição de Quartos --------------------
+    // Método para exibir a lista de quartos disponíveis
     private void mostrarQuartos() {
         Stage stage = new Stage();
         VBox v = new VBox(15);
@@ -296,6 +326,7 @@ public class HotelApp extends Application {
         v.getChildren().add(titulo);
         v.getChildren().add(new Separator());
 
+        // Consulta os quartos disponíveis no banco de dados
         try (Connection con = conectar()) {
             PreparedStatement stmt = con.prepareStatement("SELECT * FROM quartos ORDER BY numero");
             ResultSet rs = stmt.executeQuery();
@@ -328,25 +359,30 @@ public class HotelApp extends Application {
         stage.show();
     }
 
-    // -------------------- Reserva --------------------
+    // -------------------- Gerenciamento de Reservas --------------------
+    // Método para criar a tela de nova reserva
     private Scene telaReserva() {
         return criarTelaReserva(false);
     }
 
+    // Método para criar a tela de edição de reserva
     private Scene telaEditarReserva() {
         return criarTelaReserva(true);
     }
 
+    // Método para criar a tela de reserva (nova ou edição)
     private Scene criarTelaReserva(boolean editar) {
         VBox layout = new VBox(15);
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.CENTER);
         layout.setStyle("-fx-background-color: #e0f7fa; -fx-font-family: Arial;");
 
+        // Define o título da tela
         Label titulo = new Label(editar ? "Editar Reserva" : "Nova Reserva");
         titulo.setFont(Font.font("Arial", FontWeight.BOLD, 24));
         titulo.setTextFill(Color.web("#00796b"));
 
+        // Cria elementos da interface
         Label lblCliente = new Label("Cliente: ");
         lblCliente.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         lblCliente.setTextFill(Color.web("#004d40"));
@@ -361,6 +397,7 @@ public class HotelApp extends Application {
         txtQuarto.setPrefWidth(300);
         txtQuarto.setStyle("-fx-font-family: Arial; -fx-border-color: #00796b; -fx-border-radius: 5;");
 
+        // Cria botões da tela de reserva
         Button btnSelecionarQuarto = criarBotao("Selecionar Quarto", "Escolha um quarto");
         Button btnCardapio = criarBotao("Cardápio", "Escolha itens do cardápio");
         Button btnSalvar = criarBotao(editar ? "Atualizar Reserva" : "Confirmar Reserva", "Salvar reserva");
@@ -372,9 +409,11 @@ public class HotelApp extends Application {
         lblValorTotal.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         lblValorTotal.setTextFill(Color.web("#004d40"));
 
+        // Organiza os botões em um layout horizontal
         HBox botoes = new HBox(15, btnSelecionarQuarto, btnCardapio, btnSalvar, btnExcluir, btnVoltar, btnSair);
         botoes.setAlignment(Pos.CENTER);
 
+        // Cria labels para os campos de data e quarto
         Label lblDataInicio = new Label("Data Início:");
         lblDataInicio.setStyle("-fx-font-family: Arial; -fx-font-weight: bold; -fx-text-fill: #004d40;");
 
@@ -384,6 +423,7 @@ public class HotelApp extends Application {
         Label lblQuarto = new Label("Quarto:");
         lblQuarto.setStyle("-fx-font-family: Arial; -fx-font-weight: bold; -fx-text-fill: #004d40;");
 
+        // Adiciona elementos ao layout principal
         layout.getChildren().addAll(
                 titulo, new Separator(),
                 lblCliente,
@@ -393,13 +433,15 @@ public class HotelApp extends Application {
                 botoes, new Separator(), lblValorTotal
         );
 
-
+        // Carrega informações do cliente e da reserva (se for edição)
         carregarNomeCliente(lblCliente);
         if (editar) carregarReserva(txtQuarto, dpInicio, dpFim);
 
+        // Adiciona listeners para atualizar o valor total ao mudar as datas
         dpInicio.valueProperty().addListener((obs, old, newVal) -> atualizarValorTotal(newVal, dpFim.getValue()));
         dpFim.valueProperty().addListener((obs, old, newVal) -> atualizarValorTotal(dpInicio.getValue(), newVal));
 
+        // Define ações para os botões
         btnSelecionarQuarto.setOnAction(e -> selecionarQuarto(dpInicio, dpFim, txtQuarto));
         btnCardapio.setOnAction(e -> abrirCardapio(dpInicio, dpFim));
         btnSalvar.setOnAction(e -> salvarReserva(editar, txtQuarto, dpInicio, dpFim));
@@ -410,6 +452,7 @@ public class HotelApp extends Application {
         return new Scene(layout, 800, 600);
     }
 
+    // Método para carregar o nome do cliente logado
     private void carregarNomeCliente(Label lblCliente) {
         if (usuarioLogadoId == -1) return;
         try (Connection con = conectar()) {
@@ -422,6 +465,7 @@ public class HotelApp extends Application {
         }
     }
 
+    // Método para carregar os dados de uma reserva existente
     private void carregarReserva(TextField txtQuarto, DatePicker dpInicio, DatePicker dpFim) {
         try (Connection con = conectar()) {
             PreparedStatement stmt = con.prepareStatement(
@@ -450,6 +494,7 @@ public class HotelApp extends Application {
         }
     }
 
+    // Método para salvar ou atualizar uma reserva
     private void salvarReserva(boolean editar, TextField txtQuarto, DatePicker dpInicio, DatePicker dpFim) {
         if (txtQuarto.getText().isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Selecione um quarto!");
@@ -468,6 +513,7 @@ public class HotelApp extends Application {
         double total = valorQuartoSelecionado * dias + valorPratosSelecionados;
         try (Connection con = conectar()) {
             if (editar) {
+                // Atualiza uma reserva existente
                 PreparedStatement stmt = con.prepareStatement(
                         "UPDATE reservas SET quarto_id=(SELECT id FROM quartos WHERE numero=?),data_inicio=?,data_fim=?,valor_total=? WHERE usuario_id=?");
                 stmt.setString(1, txtQuarto.getText());
@@ -480,6 +526,7 @@ public class HotelApp extends Application {
                 delItens.setInt(1, reservaId);
                 delItens.executeUpdate();
             } else {
+                // Cria uma nova reserva
                 PreparedStatement stmt = con.prepareStatement(
                         "INSERT INTO reservas (usuario_id,quarto_id,data_inicio,data_fim,valor_total) VALUES (?,(SELECT id FROM quartos WHERE numero=?),?,?,?) RETURNING id");
                 stmt.setInt(1, usuarioLogadoId);
@@ -492,6 +539,7 @@ public class HotelApp extends Application {
                     reservaId = rs.getInt("id");
                 }
             }
+            // Insere os itens do cardápio selecionados na reserva
             for (int pratoId : pratosSelecionadosIds) {
                 PreparedStatement insItem = con.prepareStatement(
                         "INSERT INTO itens_reserva (reserva_id, prato_id, valor_unitario) VALUES (?, ?, (SELECT valor FROM cardapio WHERE id=?))");
@@ -503,6 +551,7 @@ public class HotelApp extends Application {
             Alert alert = new Alert(Alert.AlertType.INFORMATION, editar ? "Reserva atualizada com sucesso!" : "Reserva realizada com sucesso!");
             estilizarAlerta(alert);
             alert.showAndWait();
+            // Reseta valores após salvar
             valorPratosSelecionados = 0.0;
             valorQuartoSelecionado = 0.0;
             pratosSelecionadosIds.clear();
@@ -516,6 +565,7 @@ public class HotelApp extends Application {
         }
     }
 
+    // Método para excluir uma reserva
     private void excluirReserva() {
         try (Connection con = conectar()) {
             PreparedStatement stmt = con.prepareStatement("DELETE FROM reservas WHERE usuario_id=?");
@@ -524,6 +574,7 @@ public class HotelApp extends Application {
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Reserva excluída!");
             estilizarAlerta(alert);
             alert.showAndWait();
+            // Reseta valores após exclusão
             valorPratosSelecionados = 0.0;
             valorQuartoSelecionado = 0.0;
             pratosSelecionadosIds.clear();
@@ -534,6 +585,7 @@ public class HotelApp extends Application {
         }
     }
 
+    // Método para atualizar o valor total exibido com base nas datas
     private void atualizarValorTotal(LocalDate inicio, LocalDate fim) {
         if (inicio == null || fim == null) return;
         long dias = ChronoUnit.DAYS.between(inicio, fim);
@@ -541,6 +593,7 @@ public class HotelApp extends Application {
         lblValorTotal.setText("Valor Total: R$" + String.format("%.2f", valorQuartoSelecionado * dias + valorPratosSelecionados));
     }
 
+    // Método para selecionar um quarto
     private void selecionarQuarto(DatePicker dpInicio, DatePicker dpFim, TextField txtQuarto) {
         Stage stage = new Stage();
         VBox v = new VBox(15);
@@ -553,6 +606,7 @@ public class HotelApp extends Application {
         v.getChildren().add(new Separator());
 
         ToggleGroup tg = new ToggleGroup();
+        // Consulta os quartos disponíveis no banco de dados
         try (Connection con = conectar()) {
             PreparedStatement stmt = con.prepareStatement("SELECT * FROM quartos ORDER BY numero");
             ResultSet rs = stmt.executeQuery();
@@ -573,6 +627,7 @@ public class HotelApp extends Application {
             alert.showAndWait();
         }
 
+        // Cria botões para confirmar ou fechar a seleção
         Button btnOk = criarBotao("Selecionar", "Confirmar seleção do quarto");
         Button btnFechar = criarBotao("Fechar", "Fechar a janela");
         HBox botoes = new HBox(15, btnOk, btnFechar);
@@ -580,6 +635,7 @@ public class HotelApp extends Application {
         v.getChildren().add(new Separator());
         v.getChildren().add(botoes);
 
+        // Define ações para os botões
         btnOk.setOnAction(e -> {
             RadioButton sel = (RadioButton) tg.getSelectedToggle();
             if (sel != null) {
@@ -604,6 +660,7 @@ public class HotelApp extends Application {
         stage.show();
     }
 
+    // Método para abrir o cardápio e selecionar itens
     private void abrirCardapio(DatePicker dpInicio, DatePicker dpFim) {
         Stage stage = new Stage();
         VBox v = new VBox(15);
@@ -616,6 +673,7 @@ public class HotelApp extends Application {
         v.getChildren().add(new Separator());
 
         List<CheckBox> cbList = new ArrayList<>();
+        // Consulta os itens do cardápio no banco de dados
         try (Connection con = conectar()) {
             PreparedStatement stmt = con.prepareStatement("SELECT * FROM cardapio ORDER BY nome");
             ResultSet rs = stmt.executeQuery();
@@ -636,6 +694,7 @@ public class HotelApp extends Application {
             alert.showAndWait();
         }
 
+        // Cria botões para confirmar ou fechar o cardápio
         Button btnConfirm = criarBotao("Confirmar", "Confirmar seleção do cardápio");
         Button btnFechar = criarBotao("Fechar", "Fechar a janela");
         HBox botoes = new HBox(15, btnConfirm, btnFechar);
@@ -643,6 +702,7 @@ public class HotelApp extends Application {
         v.getChildren().add(new Separator());
         v.getChildren().add(botoes);
 
+        // Define ações para os botões
         btnConfirm.setOnAction(ev -> {
             pratosSelecionadosIds.clear();
             double total = 0;
