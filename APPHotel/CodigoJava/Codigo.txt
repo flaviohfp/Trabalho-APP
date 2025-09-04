@@ -1,6 +1,5 @@
-package hotel;
 
-//------------Bibliotecas------------
+package hotel;
 
 import javafx.application.Application;
 import javafx.geometry.HPos;
@@ -20,9 +19,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-//-----Criação da Classe que estende aplication do JavaFx.
-
-
 public class HotelApp extends Application {
     private Stage window;
     private int usuarioLogadoId = -1;
@@ -38,16 +34,13 @@ public class HotelApp extends Application {
         launch(args);
     }
 
-
-
-
     // -------------------- Conexão --------------------
     private Connection conectar() {
         try {
             return DriverManager.getConnection(
                     "jdbc:postgresql://localhost:5432/Hotel_db",
                     "postgres",
-                    "root"
+                    "Flavin7."
             );
         } catch (SQLException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Erro ao conectar ao banco! Verifique se o PostgreSQL está rodando.");
@@ -56,8 +49,6 @@ public class HotelApp extends Application {
             return null;
         }
     }
-
-
 
     // Estilizar alerts
     private void estilizarAlerta(Alert alert) {
@@ -82,10 +73,6 @@ public class HotelApp extends Application {
         window.centerOnScreen();
     }
 
-
-
-
-
     // -------------------- Tela Inicial --------------------
     private void criarTelaInicial() {
         VBox layout = new VBox(20);
@@ -97,11 +84,7 @@ public class HotelApp extends Application {
         titulo.setFont(Font.font("Arial", FontWeight.BOLD, 32));
         titulo.setTextFill(Color.web("#00796b"));
 
-
-// Botoes
-
-
- Button btnLogin = criarBotao("Login", "Acesse sua conta");
+        Button btnLogin = criarBotao("Login", "Acesse sua conta");
         Button btnReserva = criarBotao(possuiReserva(usuarioLogadoId) ? "Editar Reserva" : "Fazer Reserva", "Gerencie suas reservas");
         Button btnVerQuartos = criarBotao("Ver Quartos", "Explore nossos quartos");
         Button btnSair = criarBotao("Sair", "Fechar o aplicativo");
@@ -122,10 +105,7 @@ public class HotelApp extends Application {
         telaInicial = new Scene(layout, 800, 600);
     }
 
-
-
-
- private Button criarBotao(String texto, String tooltip) {
+    private Button criarBotao(String texto, String tooltip) {
         Button btn = new Button(texto);
         btn.setPrefWidth(250);
         btn.setStyle(
@@ -149,9 +129,7 @@ public class HotelApp extends Application {
         return btn;
     }
 
-
-
-private boolean possuiReserva(int usuarioId) {
+    private boolean possuiReserva(int usuarioId) {
         if (usuarioId == -1) return false;
         try (Connection con = conectar()) {
             PreparedStatement stmt = con.prepareStatement("SELECT COUNT(*) FROM reservas WHERE usuario_id = ?");
@@ -168,9 +146,6 @@ private boolean possuiReserva(int usuarioId) {
         window.setScene(telaInicial);
     }
 
-
-
-    
     // -------------------- Tela Login --------------------
     private void criarTelaLogin() {
         GridPane layout = criarGrid();
@@ -187,9 +162,7 @@ private boolean possuiReserva(int usuarioId) {
         Button btnVoltar = criarBotao("Voltar", "Retornar à tela inicial");
         Button btnSair = criarBotao("Sair", "Fechar o aplicativo");
 
-
-
- HBox botoes = new HBox(15, btnVoltar, btnEntrar, btnIrCadastro, btnSair);
+        HBox botoes = new HBox(15, btnVoltar, btnEntrar, btnIrCadastro, btnSair);
         botoes.setAlignment(Pos.CENTER);
         layout.add(botoes, 0, 3, 2, 1);
 
@@ -201,9 +174,7 @@ private boolean possuiReserva(int usuarioId) {
         telaLogin = new Scene(layout, 800, 600);
     }
 
-
-
-private void login(String email, String senha) {
+    private void login(String email, String senha) {
         if (email.isEmpty() || senha.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Preencha todos os campos!");
             estilizarAlerta(alert);
@@ -230,8 +201,6 @@ private void login(String email, String senha) {
             e.printStackTrace();
         }
     }
-
-
 
     // -------------------- Tela Cadastro --------------------
     private void criarTelaCadastro() {
@@ -260,7 +229,6 @@ private void login(String email, String senha) {
 
         telaCadastro = new Scene(layout, 800, 600);
     }
-
 
     private void cadastrar(String nome, String telefone, String email, String senha) {
         if (nome.isEmpty() || email.isEmpty() || senha.isEmpty()) {
@@ -314,6 +282,7 @@ private void login(String email, String senha) {
         layout.add(lbl, 0, linha);
         layout.add(campo, 1, linha);
         return campo;
+    }
 
     // -------------------- Quartos --------------------
     private void mostrarQuartos() {
@@ -358,7 +327,6 @@ private void login(String email, String senha) {
         stage.setTitle("Quartos - EasyRoom");
         stage.show();
     }
-
 
     // -------------------- Reserva --------------------
     private Scene telaReserva() {
@@ -701,4 +669,3 @@ private void login(String email, String senha) {
         stage.show();
     }
 }
-
