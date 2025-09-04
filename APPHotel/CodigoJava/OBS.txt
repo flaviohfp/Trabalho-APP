@@ -1,0 +1,19 @@
+Nosso grupo desenvolveu o aplicativo em JavaFX e, para rodá-lo no IntelliJ, é necessário fazer algumas configurações.
+
+Em Project Structure, vá até Libraries, clique no + e adicione o arquivo do PostgreSQL, que está disponível para download dentro da pasta lib no repositório GitHub.
+
+Também na pasta lib está o arquivo do OpenJFX, necessário para rodar o JavaFX. No mesmo local de antes, clique em +, entre na pasta do OpenJFX, vá até lib e adicione essa biblioteca ao projeto.
+
+Depois, para rodar o código, é preciso configurar a execução (Run Configuration).
+Vá até File > Run > Edit Configurations, clique no +, selecione Application e, no campo Name, coloque HotelApp.
+
+Em Build and Run, selecione a SDK 24 do módulo HotelApp.
+
+Clique em Modify options e ative a opção Add VM options. Dentro desse campo, coloque o caminho da pasta lib do OpenJFX.
+
+Na parte da Main class, coloque:
+
+hotel.HotelApp
+
+
+Dessa forma, o código ficará executável e o aplicativo será aberto corretamente.
