@@ -1,0 +1,53 @@
+@startuml
+class Cliente {
+    - nome: String
+    - email: String
+    - senha: String
+    + fazerLogin(): Boolean
+    + cadastrar(): Boolean
+    + visualizarQuartos(): List<Quarto>
+    + reservarQuarto(reserva: Reserva): Boolean
+    + editarReserva(reserva: Reserva): Boolean
+}
+
+class Aplicativo {
+    + autenticar(email: String, senha: String): Boolean
+    + mostrarQuartosDisponiveis(): List<Quarto>
+    + calcularValorTotal(reserva: Reserva): Double
+    + registrarReserva(reserva: Reserva): Boolean
+    + atualizarReserva(reserva: Reserva): Boolean
+    + cancelarReserva(reserva: Reserva): Boolean
+}
+
+class Quarto {
+    - numero: int
+    - tipo: String
+    - disponibilidade: Boolean
+    + verificarDisponibilidade(): Boolean
+}
+
+class Reserva {
+    - cliente: Cliente
+    - quarto: Quarto
+    - tempoHospedagem: int
+    - cardapios: List<Cardapio>
+    - valorTotal: Double
+    + calcularValorTotal(): Double
+    + atualizarTempoHospedagem(novoTempo: int)
+    + adicionarCardapio(cardapio: Cardapio)
+    + excluirReserva()
+}
+
+class Cardapio {
+    - nome: String
+    - preco: Double
+}
+
+Cliente "1" --> "0..*" Reserva : possui
+Reserva "1" --> "1" Quarto : inclui
+Reserva "0..*" --> "0..*" Cardapio : seleciona
+Aplicativo --> Cliente : gerencia
+Aplicativo --> Reserva : gerencia
+Aplicativo --> Cardapio : gerencia
+
+@enduml
