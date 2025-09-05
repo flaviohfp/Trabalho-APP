@@ -16,3 +16,12 @@ V2 ADS SENAI
 
 **Porque escolhemos o tema:** Achamos interessante e desafiador fazer um aplicativo mais complexo, onde desse modo iriamos aprender mais funções, e coisas que um projeto de aplicativo possivelmente teria;
 
+
+**Princípios de UX/UI:**
+
+- App simples e fácil de usar.
+- Navegação clara e organizada.
+- Cores suaves, fontes legíveis e destaque para elementos importantes.
+- Feedback visual para ações do usuário.
+- Padrões consistentes em todas as telas.
+
